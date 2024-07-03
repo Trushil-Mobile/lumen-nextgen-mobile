@@ -3,7 +3,7 @@ name: CI/CD for React Native
 on:
   push:
     branches:
-      - main
+      - development
 
 jobs:
   build:
