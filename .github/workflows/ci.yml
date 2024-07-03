@@ -54,13 +54,13 @@ jobs:
       run: npm run build
 
     - name: Install Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.6.10'  
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.6.10'  
 
-      - name: Install fastlane
-        run: gem install fastlane -N
+    - name: Install fastlane
+      run: gem install fastlane -N
 
-      - name: iOS Build and Test
-        run: |
-          fastlane build_ios
+    - name: iOS Build and Test
+      run: |
+        fastlane build_ios
