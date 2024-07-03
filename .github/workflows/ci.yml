@@ -46,10 +46,15 @@ jobs:
           ruby-version: 2.6
           bundler-cache: true
 
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
+      - name: Install Bundler
+        run: gem install bundler
 
-      - name: Install pod dependencies
+      - name: Install Project Dependencies
         run: |
           cd ios
-          pod install
+          bundle install
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          bundle exec pod install
