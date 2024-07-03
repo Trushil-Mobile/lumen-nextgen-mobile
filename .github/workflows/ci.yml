@@ -43,29 +43,35 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v2
         
-      - name: Prepare Android App Bundle
-        run: |
-          mkdir -p android/app/build/intermediates/assets/release/
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
+      - name: Install Gradle
+        run: sudo apt-get install -y gradle
 
-      - name: Build Android Release
-        run: |
-          cd android
-          chmod +x gradlew 
-          ./gradlew clean
-          ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
+      - name: Build Android App
+        run: npx react-native run-android
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+      # - name: Prepare Android App Bundle
+      #   run: |
+      #     mkdir -p android/app/build/intermediates/assets/release/
+      #     npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
 
-      - name: Setup Ruby (bundle)
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.0
-          bundler-cache: true
+      # - name: Build Android Release
+      #   run: |
+      #     cd android
+      #     chmod +x gradlew 
+      #     ./gradlew clean
+      #     ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
+
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: release-apk
+      #     path: android/app/build/outputs/apk/release/app-release.apk
+
+      # - name: Setup Ruby (bundle)
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: 2.7.0
+      #     bundler-cache: true
 
       # - name: Install CocoaPods
       #   run: sudo gem install cocoapods
