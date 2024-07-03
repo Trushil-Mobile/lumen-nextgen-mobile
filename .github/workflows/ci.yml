@@ -40,6 +40,9 @@ jobs:
       - name: Lint
         run: npx eslint
 
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_14.3.app/Contents/Developer
+
       - name: Setup Ruby (bundle)
         uses: ruby/setup-ruby@v1
         with:
