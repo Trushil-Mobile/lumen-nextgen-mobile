@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install
@@ -37,7 +37,5 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Setup Node  
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
+      - name: Lint
+        run: npx eslint
