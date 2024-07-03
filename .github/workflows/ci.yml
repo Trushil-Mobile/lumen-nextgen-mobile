@@ -21,7 +21,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '22'
 
     - name: Install dependencies
       run: npm install
@@ -29,14 +29,14 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'adopt'
 
     - name: Install Android SDK
-      run: sdkmanager "platforms;android-30" "build-tools;30.0.3"
+      run: sdkmanager "platforms;android-34" "build-tools;34.0.3"
 
     - name: Build Android
       run: ./gradlew assembleDebug
@@ -52,3 +52,15 @@ jobs:
 
     - name: Build application
       run: npm run build
+
+    - name: Install Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.6.10'  
+
+      - name: Install fastlane
+        run: gem install fastlane -N
+
+      - name: iOS Build and Test
+        run: |
+          fastlane build_ios
