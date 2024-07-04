@@ -81,21 +81,40 @@ jobs:
     runs-on: macos-latest
     steps:
 
-      - name: checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '22'
-          cache: 'npm'
 
-      - name: install npm dependencies
-        run: |
-          npm install   
+      - name: Install dependencies
+        run: npm install
 
-      - name: check Xcode version
-        run: /usr/bin/xcodebuild -version
-        
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0.0'
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Install CocoaPods
+        run: bundle install
+        working-directory: ios
+
+      - name: Cache Pods
+        uses: actions/cache@v4
+        id: pods-cache
+        with:
+          path: ./ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+
+      - name: Install Pods
+        run: bundle exec pod install
+        working-directory: ios
+
       - name: Clean workspace
         run: |
           git clean -ffdx
@@ -104,13 +123,7 @@ jobs:
       - name: Clean Xcode Build
         run: |
           cd ios
-          xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile 
-
-      - name: install Cocoapod dependencies
-        run: |
-          cd ios
-          pod repo update
-          pod install  
+          xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
 
       - name: build archive
         run: |
@@ -121,7 +134,11 @@ jobs:
           -configuration Release \
           -destination generic/platform=iOS \
           -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
-          archive
+          archive   
+
+      # - name: Build and Test with Fastlane
+      #   run: bundle exec fastlane build_and_test
+      #   working-directory: ios
 
       # - name: Build and Test
       #   env:
