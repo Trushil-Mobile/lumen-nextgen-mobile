@@ -9,84 +9,93 @@ on:
       - development
 
 jobs:
-  # ----------------------- ANDROID -----------------------------
-  build-android:
-    name: Build android app & release apk
-    runs-on: ubuntu-latest
+  # # ----------------------- ANDROID -----------------------------
+  # build-android:
+  #   name: Build android app & release apk
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Step 1: Checkout the repository
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
+
+  #     # Step 2: Set up Node.js environment
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '22'
+
+  #     # Step 3: Install npm dependencies
+  #     - name: Install dependencies
+  #       run: npm install
+
+  #     # Step 4: Run tests
+  #     - name: Run tests
+  #       run: npm test
+
+  #     # Step 5: Run linter
+  #     - name: Lint
+  #       run: npx eslint
+
+  #     # Step 6: Set up JDK 17
+  #     - name: Set up JDK 17
+  #       uses: actions/setup-java@v3
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'adopt'
+  #         cache: "gradle"
+
+  #     # Step 7: Validate Gradle wrapper
+  #     - name: Validate Gradle wrapper
+  #       uses: gradle/wrapper-validation-action@v1
+
+  #     # Step 8: Install Android SDK
+  #     - name: Install Android SDK
+  #       uses: android-actions/setup-android@v2
+
+  #     # Step 9: Prepare Android App Bundle
+  #     - name: Prepare Android App Bundle
+  #       run: |
+  #         mkdir -p android/app/build/intermediates/assets/release/
+  #         npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
+
+  #     # Step 10: Build Android Release
+  #     - name: Build Android Release
+  #       run: |
+  #         cd android
+  #         chmod +x gradlew 
+  #         ./gradlew clean
+  #         ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
+
+  #     # Step 11: Upload APK
+  #     - name: Upload APK
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: release-apk
+  #         path: android/app/build/outputs/apk/release/app-release.apk
+
+      
+      
+
+  # ----------------------- IOS -----------------------------
+  build-ios:
+    runs-on: macos-12
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
 
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      # Step 3: Install npm dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Step 4: Run tests
-      - name: Run tests
-        run: npm test
-
-      # Step 5: Run linter
-      - name: Lint
-        run: npx eslint
-
-      # Step 6: Set up JDK 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-          cache: "gradle"
-
-      # Step 7: Validate Gradle wrapper
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
-
-      # Step 8: Install Android SDK
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v2
-
-      # Step 9: Prepare Android App Bundle
-      - name: Prepare Android App Bundle
-        run: |
-          mkdir -p android/app/build/intermediates/assets/release/
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
-
-      # Step 10: Build Android Release
-      - name: Build Android Release
-        run: |
-          cd android
-          chmod +x gradlew 
-          ./gradlew clean
-          ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
-
-      # Step 11: Upload APK
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
-
-      # Step 12: Set up Ruby for bundle (if needed)
+      # Set up Ruby for bundle (if needed)
       - name: Setup Ruby (bundle)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7.0
           bundler-cache: true
 
-  # ----------------------- IOS -----------------------------
-  # build-ios:
-  #   runs-on: macos-12
-  #   steps:
-  #     # Uncomment and add steps for iOS build process as needed
-  #     # - name: Install CocoaPods
-  #     #   run: sudo gem install cocoapods
+      - name: Cache Pods
+        uses: actions/cache@v4
+        id: pods-cache
+        with:
+          path: ./ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
 
-  #     # - name: Install pods
-  #     #   run: cd ios && pod install --repo-update && cd ..
+      # - name: Install pods
+      #   run: cd ios && pod install --repo-update && cd ..
