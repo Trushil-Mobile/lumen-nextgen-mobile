@@ -116,6 +116,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pods-
 
+      - name: Remove Derived Data and Pods
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ios/Pods
+
       - name: Install Pods
         run: bundle exec pod install --verbose
         working-directory: ios
@@ -144,7 +149,9 @@ jobs:
           -sdk iphonesimulator \
           -configuration Debug \
           -destination 'platform=iOS Simulator,name=iPhone 14' \
-          build
+          build | xcpretty
+        env:
+          XCPRETTY_JSON_FILE_OUTPUT: "build/reports/xcodebuild.json"
     
       # - name: Build and Test with Fastlane
       #   run: bundle exec fastlane build_and_test
