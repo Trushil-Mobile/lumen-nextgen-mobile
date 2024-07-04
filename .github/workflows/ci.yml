@@ -125,7 +125,7 @@ jobs:
         working-directory: ios
 
       - name: Set up Xcode
-        run: xcode-select --install
+        run: sudo xcode-select -s /Applications/Xcode_$(matrix.xcode-version).app/Contents/Developer
 
       - name: Install fastlane
         run: gem install fastlane
