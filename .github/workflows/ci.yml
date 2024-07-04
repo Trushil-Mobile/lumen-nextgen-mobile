@@ -81,12 +81,12 @@ jobs:
           bundler-cache: true
 
   # ----------------------- IOS -----------------------------
-  build-ios:
-    runs-on: macos-12
-    steps:
-      # Uncomment and add steps for iOS build process as needed
-      # - name: Install CocoaPods
-      #   run: sudo gem install cocoapods
+  # build-ios:
+  #   runs-on: macos-12
+  #   steps:
+  #     # Uncomment and add steps for iOS build process as needed
+  #     # - name: Install CocoaPods
+  #     #   run: sudo gem install cocoapods
 
-      # - name: Install pods
-      #   run: cd ios && pod install --repo-update && cd ..
+  #     # - name: Install pods
+  #     #   run: cd ios && pod install --repo-update && cd ..
