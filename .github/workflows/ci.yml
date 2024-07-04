@@ -82,7 +82,7 @@ jobs:
     steps:
       - name: check Xcode version
         run: /usr/bin/xcodebuild -version
-        
+
       - name: checkout repository
         uses: actions/checkout@v3
 
@@ -99,7 +99,7 @@ jobs:
       - name: Clean Xcode Build
         run: |
           cd ios
-          xcodebuild clean -workspace your_app.xcworkspace -scheme your_app
+          xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
 
       - name: install yarn dependencies
         run: |
@@ -115,12 +115,12 @@ jobs:
       - name: build archive
         run: |
           cd ios
-          xcodebuild -workspace your_app.xcworkspace \
-          -scheme "your_app" \
+          xcodebuild -workspace lumen_nextgen_mobile.xcworkspace \
+          -scheme "lumen_nextgen_mobile" \
           -sdk iphoneos \
           -configuration Release \
           -destination generic/platform=iOS \
-          -archivePath $RUNNER_TEMP/your_app.xcarchive \
+          -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
           archive
 
       # - name: Build and Test
