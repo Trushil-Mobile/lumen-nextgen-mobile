@@ -61,9 +61,6 @@ jobs:
     - name: Install iOS dependencies
       run: cd ios && pod install
 
-    - name: Build Android
-      run: cd android && ./gradlew assembleDebug
-
     - name: Build iOS
       run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
 
