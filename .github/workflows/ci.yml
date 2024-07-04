@@ -78,7 +78,7 @@ jobs:
 
   # ----------------------- IOS -----------------------------
   build-ios:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
 
       - name: Checkout code
@@ -92,10 +92,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Determine Latest Ruby Version
+        id: ruby_version
+        run: |
+          echo "Fetching the latest stable Ruby version..."
+          latest_version=$(curl -sSL https://www.ruby-lang.org/en/downloads/ | grep -oP 'The current stable version is \K[\d.]+' | head -n 1)
+          echo "Latest stable Ruby version is $latest_version"
+          echo "ruby-version=$latest_version" >> $GITHUB_ENV
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 'latest'
+          ruby-version: ${{ env.ruby-version }}
 
       - name: Install CocoaPods
         run: sudo gem install cocoapods
