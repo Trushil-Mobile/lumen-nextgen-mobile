@@ -16,11 +16,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        node-version: [22]
+        architecture: [x64, arm64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
@@ -41,15 +43,6 @@ jobs:
     needs: common-steps
     runs-on: ubuntu-latest
     steps:
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      - name: Install npm dependencies
-        run: npm install
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -83,14 +76,12 @@ jobs:
 
   # ----------------------- IOS -----------------------------
   build-ios:
-    needs: common-steps
+    needs: Build iOS App
     runs-on: macos-latest
     strategy:
       matrix:
-        node-version: [22]
         architecture: [x64, arm64]
     steps:
-
       - name: Install CocoaPods
         run: sudo gem install cocoapods
 
