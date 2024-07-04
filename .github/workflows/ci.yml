@@ -95,16 +95,11 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7.0'
+          ruby-version: 'latest'
 
       - name: Install CocoaPods
         run: sudo gem install cocoapods
 
-      - name: Setup Ruby (bundle)
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.0
-          bundler-cache: true
 
       # - name: Install Bundler
       #   run: gem install bundler
