@@ -135,28 +135,9 @@ jobs:
           cd ios
           xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
 
-      - name: Create Build Reports Directory
-        run: mkdir -p ios/build/reports
-
-      - name: Build for Simulator
-        run: |
-          cd ios
-          set -o pipefail && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace \
-          -scheme "lumen_nextgen_mobile" \
-          -sdk iphonesimulator \
-          -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 14' \
-          build | xcpretty --report json-compilation-database --output build/reports/xcodebuild.json
-        env:
-          XCPRETTY_JSON_FILE_OUTPUT: "ios/build/reports/xcodebuild.json"
-          
-      - name: Upload Xcode Build Logs
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: xcode-build-logs
-          path: ios/build/reports/xcodebuild.json
-          if-no-files-found: warn
+      - name: Build and test
+        run: xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile "CI" -destination 'platform=iOS Simulator,name=iPhone 14' CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        
 
       # - name: Build and Test with Fastlane
       #   run: bundle exec fastlane build_and_test
