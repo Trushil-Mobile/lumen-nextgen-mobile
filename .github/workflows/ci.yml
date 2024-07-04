@@ -97,10 +97,13 @@ jobs:
         with:
           ruby-version: '3.0.0'
 
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods
+      - name: Install Bundler
+        run: gem install bundler
 
       - name: Install CocoaPods
+        run: gem install cocoapods
+
+      - name: Install dependencies from Gemfile
         run: bundle install
         working-directory: ios
 
@@ -112,7 +115,7 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
 
       - name: Install Pods
-        run: bundle exec pod install
+        run: bundle exec pod install --verbose
         working-directory: ios
 
       - name: Clean workspace
@@ -125,6 +128,17 @@ jobs:
           cd ios
           xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
 
+      - name: Set up code signing
+        run: |
+          security create-keychain -p actions build.keychain
+          security import /path/to/certificate.cer -k ~/Library/Keychains/build.keychain -T /usr/bin/codesign
+          security import /path/to/key.p12 -k ~/Library/Keychains/build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
+          security list-keychains -d user -s ~/Library/Keychains/build.keychain
+          security unlock-keychain -p actions ~/Library/Keychains/build.keychain
+          security set-keychain-settings -t 3600 -u ~/Library/Keychains/build.keychain
+          echo $CERTIFICATE_PRIVATE_KEY_PWD | security import ./Certs/$CERTIFICATE_NAME.p12 -k ~/Library/Keychains/build.keychain -P $CERTIFICATE_PRIVATE_KEY_PWD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k actions ~/Library/Keychains/build.keychain
+
       - name: build archive
         run: |
           cd ios
@@ -134,7 +148,14 @@ jobs:
           -configuration Release \
           -destination generic/platform=iOS \
           -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
-          archive   
+          archive
+
+      - name: Export Archive
+        run: |
+          xcodebuild -exportArchive \
+          -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
+          -exportPath $RUNNER_TEMP \
+          -exportOptionsPlist ios/exportOptions.plist
 
       # - name: Build and Test with Fastlane
       #   run: bundle exec fastlane build_and_test
