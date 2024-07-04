@@ -106,8 +106,8 @@ jobs:
           ruby-version: 2.7.0
           bundler-cache: true
 
-      - name: Install Bundler
-        run: gem install bundler
+      # - name: Install Bundler
+      #   run: gem install bundler
 
       - name: Install CocoaPods
         run: bundle install
