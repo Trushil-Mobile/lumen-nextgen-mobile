@@ -11,7 +11,7 @@ on:
 jobs:
   build-ios:
     name: Build iOS App
-    uses: ./.github/workflows/shared.yml
+    uses: ./.github/workflows/common.yml
     with:
       runner: macos-latest
       node-version: '22'
