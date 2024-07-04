@@ -119,9 +119,6 @@ jobs:
         run: bundle exec pod install
         working-directory: ios
 
-      - name: Set up Xcode
-        run: xcode-select --install
-
       - name: Install fastlane
         run: gem install fastlane
 
