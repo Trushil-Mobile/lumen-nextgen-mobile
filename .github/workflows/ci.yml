@@ -57,15 +57,6 @@ jobs:
         key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pods-
-          
-    - name: Setup Nodejs with yarn caching
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: yarn       
-
-    - name: Install dependencies for iOS
-      run: yarn install
 
     - name: Install iOS dependencies
       run: cd ios && pod install
@@ -77,4 +68,4 @@ jobs:
       run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
 
     - name: Run tests
-      run: yarn test
+      run: npm test
