@@ -124,8 +124,8 @@ jobs:
 
       - name: Build and Test
         env:
-          XCODE_WORKSPACE: ios/YourApp.xcworkspace
-          XCODE_SCHEME: YourApp
+          XCODE_WORKSPACE: ios/lumen_nextgen_mobile.xcworkspace
+          XCODE_SCHEME: lumen_nextgen_mobile
           XCODE_DESTINATION: 'platform=iOS Simulator,OS=14.5,name=iPhone 12'
         run: |
           xcodebuild clean -workspace $XCODE_WORKSPACE -scheme $XCODE_SCHEME -configuration Debug -sdk iphonesimulator
