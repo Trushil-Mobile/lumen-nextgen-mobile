@@ -41,11 +41,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-    - name: Setup JDK 11 for Android
+    - name: Setup JDK 17 for Android
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
-        java-version: '11'
+        java-version: '17'
 
     - name: Install CocoaPods
       run: sudo gem install cocoapods
