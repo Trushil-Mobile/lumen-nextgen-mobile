@@ -80,8 +80,6 @@ jobs:
   build-ios:
     runs-on: macos-latest
     steps:
-      - name: check Xcode version
-        run: /usr/bin/xcodebuild -version
 
       - name: checkout repository
         uses: actions/checkout@v3
@@ -89,8 +87,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '22'
-          cache: 'yarn'
+          cache: 'npm'
 
+      - name: install npm dependencies
+        run: |
+          npm install   
+
+      - name: check Xcode version
+        run: /usr/bin/xcodebuild -version
+        
       - name: Clean workspace
         run: |
           git clean -ffdx
@@ -99,12 +104,7 @@ jobs:
       - name: Clean Xcode Build
         run: |
           cd ios
-          xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
-
-      - name: install yarn dependencies
-        run: |
-          cd ios
-          yarn install    
+          xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile 
 
       - name: install Cocoapod dependencies
         run: |
