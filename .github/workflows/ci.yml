@@ -128,35 +128,16 @@ jobs:
           cd ios
           xcodebuild clean -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile
 
-      - name: Set up code signing
-        run: |
-          security create-keychain -p actions build.keychain
-          security import /path/to/certificate.cer -k ~/Library/Keychains/build.keychain -T /usr/bin/codesign
-          security import /path/to/key.p12 -k ~/Library/Keychains/build.keychain -P $KEY_PASSWORD -T /usr/bin/codesign
-          security list-keychains -d user -s ~/Library/Keychains/build.keychain
-          security unlock-keychain -p actions ~/Library/Keychains/build.keychain
-          security set-keychain-settings -t 3600 -u ~/Library/Keychains/build.keychain
-          echo $CERTIFICATE_PRIVATE_KEY_PWD | security import ./Certs/$CERTIFICATE_NAME.p12 -k ~/Library/Keychains/build.keychain -P $CERTIFICATE_PRIVATE_KEY_PWD -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k actions ~/Library/Keychains/build.keychain
-
-      - name: build archive
+      - name: Build for Simulator
         run: |
           cd ios
           xcodebuild -workspace lumen_nextgen_mobile.xcworkspace \
           -scheme "lumen_nextgen_mobile" \
-          -sdk iphoneos \
-          -configuration Release \
-          -destination generic/platform=iOS \
-          -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
-          archive
-
-      - name: Export Archive
-        run: |
-          xcodebuild -exportArchive \
-          -archivePath $RUNNER_TEMP/lumen_nextgen_mobile.xcarchive \
-          -exportPath $RUNNER_TEMP \
-          -exportOptionsPlist ios/exportOptions.plist
-
+          -sdk iphonesimulator \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 14' \
+          build
+    
       # - name: Build and Test with Fastlane
       #   run: bundle exec fastlane build_and_test
       #   working-directory: ios
