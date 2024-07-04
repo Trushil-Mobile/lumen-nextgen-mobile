@@ -113,10 +113,18 @@ jobs:
         with:
           path: ./ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: Install Pods
         run: bundle exec pod install --verbose
         working-directory: ios
+
+      - name: Verify Pod Installation
+        run: |
+          cd ios
+          pod update
+          pod install
 
       - name: Clean workspace
         run: |
