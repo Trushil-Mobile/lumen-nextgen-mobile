@@ -76,7 +76,8 @@ jobs:
 
   # ----------------------- IOS -----------------------------
   build-ios:
-    needs: Build iOS App
+    name: Build iOS App
+    needs: common-steps
     runs-on: macos-latest
     strategy:
       matrix:
