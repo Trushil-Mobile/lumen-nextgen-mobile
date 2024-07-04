@@ -57,6 +57,12 @@ jobs:
         key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pods-
+          
+    - name: Setup Nodejs with yarn caching
+      uses: actions/setup-node@v2
+      with:
+        node-version: "14"
+        cache: yarn       
 
     - name: Install dependencies for iOS
       run: yarn install
