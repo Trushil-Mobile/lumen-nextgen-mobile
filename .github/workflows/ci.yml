@@ -42,6 +42,7 @@ jobs:
   test-and-lint:
     name: Test and Lint Code
     runs-on: macos-latest
+    needs: common-setup
     strategy:
       matrix:
         node-version: [22]
