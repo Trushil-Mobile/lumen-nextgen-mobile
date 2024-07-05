@@ -9,18 +9,15 @@ on:
       - development
 
 jobs:
-  # ----------------------- COMMON STEPS -----------------------------
-  common-setup:
-    name: Common Setup
+  # ----------------------- ANDROID -----------------------------
+  build-android:
+    name: Build Android App & Release APK
     runs-on: ubuntu-latest
-    outputs:
-      node_version: ${{ steps.node-version.outputs.node-version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Node.js
-        id: node-version
         uses: actions/setup-node@v3
         with:
           node-version: '22'
@@ -30,15 +27,6 @@ jobs:
 
       - name: Run tests
         run: npm test
-
-  # ----------------------- ANDROID -----------------------------
-  build-android:
-    name: Build Android App & Release APK
-    runs-on: ubuntu-latest
-    needs: common-setup
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
       - name: Lint
         run: npx eslint
@@ -71,7 +59,6 @@ jobs:
   # ----------------------- IOS -----------------------------
   build-ios:
     runs-on: macos-latest
-    needs: common-setup
     strategy:
       matrix:
         node-version: [22]
@@ -85,6 +72,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           architecture: ${{ matrix.architecture }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
 
       - name: Install CocoaPods
         run: gem install cocoapods
@@ -103,3 +96,4 @@ jobs:
 
       - name: Build iOS
         run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
+
