@@ -9,17 +9,27 @@ on:
       - development
 
 jobs:
-  # ----------------------- ANDROID -----------------------------
-  build-android:
-    name: Build Android App
-    runs-on: ubuntu-latest
+  # ----------------------- COMMON ------------------------------
+  common-setup:
+    name: Common Setup
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         node-version: [22]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
+
+  # ----------------------- ANDROID -----------------------------
+  build-android:
+    name: Build Android App
+    needs: common-setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.0.2
@@ -63,14 +73,13 @@ jobs:
   # ----------------------- IOS -----------------------------
   build-ios:
     name: Build iOS App
+    needs: common-setup
     runs-on: macos-latest
     strategy:
       matrix:
         node-version: [22]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.1.7
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.0.2
