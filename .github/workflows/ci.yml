@@ -13,10 +13,6 @@ jobs:
   common-setup:
     name: Common Setup
     runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        node-version: [22]
 
     steps:
       - name: Checkout repository
