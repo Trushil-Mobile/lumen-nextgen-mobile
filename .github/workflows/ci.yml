@@ -9,13 +9,11 @@ on:
       - development
 
 jobs:
-  # ----------------------- COMMON SETUP -----------------------------
-  common-setup:
-    name: Common Setup
+  ci:
     runs-on: macos-latest
-    needs: common-setup
     strategy:
       matrix:
+        target: [test-and-lint, build-android, build-ios]
         node-version: [22]
 
     steps:
@@ -38,54 +36,18 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-  # ----------------------- TESTING AND LINTING -----------------------------
-  test-and-lint:
-    name: Test and Lint Code
-    runs-on: macos-latest
-    needs: common-setup
-    strategy:
-      matrix:
-        node-version: [22]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      # ----------------------- TESTING AND LINTING -----------------------------
       - name: Run tests
+        if: matrix.target == 'test-and-lint'
         run: npm test
 
       - name: Lint
-        run: npx eslint
+        if: matrix.target == 'test-and-lint'
+        run: npx eslint .
 
-  # ----------------------- ANDROID -----------------------------
-  build-android:
-    name: Build Android App
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        node-version: [22]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
-          restore-keys: |
-            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
-
-      - name: Install npm dependencies
-        run: npm install
-
+      # ----------------------- ANDROID -----------------------------
       - name: Set up JDK 17
+        if: matrix.target == 'build-android'
         uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -93,55 +55,34 @@ jobs:
           cache: gradle
 
       - name: Validate Gradle wrapper
+        if: matrix.target == 'build-android'
         uses: gradle/wrapper-validation-action@v1
 
       - name: Install Android SDK
+        if: matrix.target == 'build-android'
         uses: android-actions/setup-android@v2
 
       - name: Prepare Android App Bundle
+        if: matrix.target == 'build-android'
         run: |
           mkdir -p android/app/build/intermediates/assets/release/
           npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
 
       - name: Build Android
+        if: matrix.target == 'build-android'
         run: |
           cd android
           chmod +x gradlew
           ./gradlew clean
           ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
 
-  # ----------------------- IOS -----------------------------
-  build-ios:
-    name: Build iOS App
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        node-version: [22]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
-          restore-keys: |
-            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
-
-      - name: Install npm dependencies
-        run: npm install
-
+      # ----------------------- IOS -----------------------------
       - name: Install CocoaPods
+        if: matrix.target == 'build-ios'
         run: gem install cocoapods
 
       - name: Cache CocoaPods
+        if: matrix.target == 'build-ios'
         uses: actions/cache@v3
         with:
           path: ios/Pods
@@ -150,7 +91,9 @@ jobs:
             ${{ runner.os }}-pods
 
       - name: Install iOS dependencies
+        if: matrix.target == 'build-ios'
         run: cd ios && pod install
 
       - name: Build iOS
+        if: matrix.target == 'build-ios'
         run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
