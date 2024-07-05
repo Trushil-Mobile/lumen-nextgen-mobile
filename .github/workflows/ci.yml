@@ -19,6 +19,9 @@ jobs:
         node-version: [22]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+        
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4.0.2
         with:
@@ -43,7 +46,6 @@ jobs:
         node-version: [22]
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
 
