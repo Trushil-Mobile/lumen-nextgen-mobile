@@ -114,4 +114,4 @@ jobs:
         run: cd ios && pod install
 
       - name: Build iOS
-        run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug buildonfiguration Release build
+        run: xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug buildonfiguration Release build
