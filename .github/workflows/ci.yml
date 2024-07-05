@@ -9,12 +9,18 @@ on:
       - development
 
 jobs:
-  common-steps: &common-steps
+  # ----------------------- COMMON STEPS -----------------------------
+  common-setup:
+    name: Common Setup
+    runs-on: ubuntu-latest
+    outputs:
+      node_version: ${{ steps.node-version.outputs.node-version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Node.js
+        id: node-version
         uses: actions/setup-node@v3
         with:
           node-version: '22'
@@ -29,8 +35,10 @@ jobs:
   build-android:
     name: Build Android App & Release APK
     runs-on: ubuntu-latest
+    needs: common-setup
     steps:
-      <<: *common-steps
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Lint
         run: npx eslint
@@ -63,12 +71,14 @@ jobs:
   # ----------------------- IOS -----------------------------
   build-ios:
     runs-on: macos-latest
+    needs: common-setup
     strategy:
       matrix:
         node-version: [22]
         architecture: [x64, arm64]
     steps:
-      <<: *common-steps
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
