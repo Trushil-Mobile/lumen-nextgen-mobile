@@ -1,4 +1,4 @@
-name: CI
+name: CI Lumen Nextgen Mobile
 
 on:
   push:
@@ -13,8 +13,10 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [test-and-lint, build-android, build-ios]
+        target: [Common-lumen-nextgen-mobile, Build-lumen-nextgen-mobile-android, Build-lumen-nextgen-mobile-ios]
         node-version: [22]
+
+    name: ${{ matrix.target }}
 
     steps:
       - name: Checkout repository
@@ -38,16 +40,16 @@ jobs:
 
       # ----------------------- TESTING AND LINTING -----------------------------
       - name: Run tests
-        if: matrix.target == 'test-and-lint'
+        if: matrix.target == 'Common-lumen-nextgen-mobile'
         run: npm test
 
       - name: Lint
-        if: matrix.target == 'test-and-lint'
+        if: matrix.target == 'Common-lumen-nextgen-mobile'
         run: npx eslint
 
       # ----------------------- ANDROID -----------------------------
       - name: Set up JDK 17
-        if: matrix.target == 'build-android'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-android'
         uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -55,21 +57,21 @@ jobs:
           cache: gradle
 
       - name: Validate Gradle wrapper
-        if: matrix.target == 'build-android'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-android'
         uses: gradle/wrapper-validation-action@v1
 
       - name: Install Android SDK
-        if: matrix.target == 'build-android'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-android'
         uses: android-actions/setup-android@v2
 
       - name: Prepare Android App Bundle
-        if: matrix.target == 'build-android'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-android'
         run: |
           mkdir -p android/app/build/intermediates/assets/release/
           npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
 
       - name: Build Android
-        if: matrix.target == 'build-android'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-android'
         run: |
           cd android
           chmod +x gradlew
@@ -78,11 +80,11 @@ jobs:
 
       # ----------------------- IOS -----------------------------
       - name: Install CocoaPods
-        if: matrix.target == 'build-ios'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-ios'
         run: gem install cocoapods
 
       - name: Cache CocoaPods
-        if: matrix.target == 'build-ios'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-ios'
         uses: actions/cache@v3
         with:
           path: ios/Pods
@@ -91,9 +93,9 @@ jobs:
             ${{ runner.os }}-pods
 
       - name: Install iOS dependencies
-        if: matrix.target == 'build-ios'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-ios'
         run: cd ios && pod install
 
       - name: Build iOS
-        if: matrix.target == 'build-ios'
+        if: matrix.target == 'Build-lumen-nextgen-mobile-ios'
         run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
