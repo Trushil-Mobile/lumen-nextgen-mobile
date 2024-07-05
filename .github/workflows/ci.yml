@@ -41,7 +41,7 @@ jobs:
         run: npm test
 
       - name: Lint
-        run: npx eslint .
+        run: npx eslint
 
   # ----------------------- ANDROID -----------------------------
   build-android:
