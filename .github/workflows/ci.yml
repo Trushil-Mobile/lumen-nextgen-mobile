@@ -10,7 +10,7 @@ on:
 
 jobs:
   # ----------------------- COMMON -----------------------------
-  setup-environment:
+  common-setup: &common-setup
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,6 +37,7 @@ jobs:
     needs: setup-environment
     runs-on: ubuntu-latest
     steps:
+      - <<: *common-setup
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -68,6 +69,7 @@ jobs:
     needs: setup-environment
     runs-on: macos-latest
     steps:
+      - <<: *common-setup
       - name: Install CocoaPods
         run: gem install cocoapods
 
