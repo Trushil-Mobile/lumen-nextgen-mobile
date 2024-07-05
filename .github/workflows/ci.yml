@@ -9,21 +9,30 @@ on:
       - development
 
 jobs:
-  # ----------------------- COMMON -----------------------------
-  common-setup: &common-setup
-    runs-on: ${{ matrix.os }}
+  # ----------------------- TESTING AND LINTING -----------------------------
+  test-and-lint:
+    name: Test and Lint Code
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
         node-version: [22]
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4
 
       - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
 
       - name: Install npm dependencies
         run: npm install
@@ -31,13 +40,37 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Lint
+        run: npx eslint .
+
   # ----------------------- ANDROID -----------------------------
   build-android:
     name: Build Android App
-    needs: setup-environment
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
+
     steps:
-      - <<: *common-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+
+      - name: Install npm dependencies
+        run: npm install
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -66,12 +99,41 @@ jobs:
   # ----------------------- IOS -----------------------------
   build-ios:
     name: Build iOS App
-    needs: setup-environment
     runs-on: macos-latest
+    strategy:
+      matrix:
+        node-version: [22]
+
     steps:
-      - <<: *common-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+
+      - name: Install npm dependencies
+        run: npm install
+
       - name: Install CocoaPods
         run: gem install cocoapods
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods
+          restore-keys: |
+            ${{ runner.os }}-pods
 
       - name: Install iOS dependencies
         run: cd ios && pod install
