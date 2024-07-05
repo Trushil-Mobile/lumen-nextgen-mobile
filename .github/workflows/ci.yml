@@ -41,19 +41,6 @@ jobs:
           npm test
           npx eslint
 
-      # Build Android App
-      - name: Build Android App
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk
-          mkdir -p android/app/build/intermediates/assets/release/
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/build/intermediates/assets/release/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release
-          cd android
-          chmod +x gradlew
-          ./gradlew clean
-          ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
-
       # Build iOS App
       - name: Build iOS App
         if: runner.os == 'macOS'
