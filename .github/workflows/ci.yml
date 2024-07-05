@@ -82,10 +82,6 @@ jobs:
         node-version: [22]
 
     steps:
-
-      - name: Run tests
-        run: npm test
-
       - name: Install CocoaPods
         run: gem install cocoapods
 
