@@ -43,14 +43,13 @@ jobs:
       - name: Lint
         run: npx eslint
 
-  # ----------------------- ANDROID & IOS -----------------------------
-  
-  build:
-    name: Build Android and iOS App
-    runs-on: macos-latest
+  # ----------------------- ANDROID -----------------------------
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22]  # Adjust Node.js version as per your project requirements
+        node-version: [22]
 
     steps:
       - name: Checkout repository
@@ -65,14 +64,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
           restore-keys: |
-            ${{ runner.os }}-node-${{ matrix.node-version }}-
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
 
       - name: Install npm dependencies
         run: npm install
 
-      # Android build steps
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -98,7 +96,34 @@ jobs:
           ./gradlew clean
           ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
 
-      # iOS build steps
+  # ----------------------- IOS -----------------------------
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+
+      - name: Install npm dependencies
+        run: npm install
+
       - name: Install CocoaPods
         run: gem install cocoapods
 
@@ -106,7 +131,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          key: ${{ runner.os }}-pods
           restore-keys: |
             ${{ runner.os }}-pods
 
@@ -114,4 +139,4 @@ jobs:
         run: cd ios && pod install
 
       - name: Build iOS
-        run: xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug buildonfiguration Release build
+        run: cd ios && xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
