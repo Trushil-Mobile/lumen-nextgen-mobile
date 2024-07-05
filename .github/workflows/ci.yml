@@ -9,9 +9,9 @@ on:
       - development
 
 jobs:
-  # ----------------------- TESTING, LINTING, AND BUILDING -----------------------------
-  test-lint-build:
-    name: Test, Lint, and Build Apps
+  # ----------------------- TESTING AND LINTING -----------------------------
+  test-and-lint:
+    name: Test and Lint Code
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,17 +34,56 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-deps
 
-      # Testing and linting
-      - name: Install npm dependencies, Test, and Lint
-        run: |
-          npm install
-          npm test
-          npx eslint
+      - name: Install npm dependencies
+        run: npm install
 
-      # Build iOS App
-      - name: Build iOS App
-        if: runner.os == 'macOS'
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npx eslint
+
+  # ----------------------- ANDROID & IOS -----------------------------
+  build:
+    name: Build App
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [22]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-deps
+
+      - name: Install npm dependencies
+        run: npm install
+
+      # Specific steps for each platform
+      - if: matrix.os == 'ubuntu-latest'
+        name: Build Android
         run: |
-          gem install cocoapods
-          cd ios && pod install
-          xcodebuild -workspace lumen_nextgen_mobile.xcworkspace -scheme lumen_nextgen_mobile -sdk iphonesimulator -configuration Debug build
+          cd android
+          chmod +x gradlew
+          ./gradlew clean
+          ./gradlew bundleRelease -Pkeystore.password=${{ secrets.KEYSTORE_PASSWORD }}
+
+      - if: matrix.os == 'macos-latest'
+        name: Build iOS
+        run: |
+          cd ios
+          xcodebuild -workspace YourProject.xcworkspace -scheme YourScheme -destination 'platform=iOS Simulator,name=iPhone 12' build
