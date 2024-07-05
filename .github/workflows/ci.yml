@@ -43,7 +43,7 @@ jobs:
 
       - name: Lint
         if: matrix.target == 'test-and-lint'
-        run: npx eslint .
+        run: npx eslint
 
       # ----------------------- ANDROID -----------------------------
       - name: Set up JDK 17
